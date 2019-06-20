@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <ListPreference
+        android:defaultValue="@string/star_pos_defaultValue"
+        android:dialogTitle="@string/star_pos_dialog_title"
+        android:entries="@array/starPosArrayEntries"
+        android:entryValues="@array/starPosArrayValues"
+        android:icon="@drawable/ic_star_black_24dp"
+        android:key="@string/star_pos_key"
+        android:title="@string/star_pos_dialog_title" />
+
+    <ListPreference
+        android:defaultValue="@string/save_answer_defaultValue"
+        android:dialogTitle="@string/save_answer_dialog_title"
+        android:entries="@array/saveAnswersArrayEntries"
+        android:entryValues="@array/saveAnswersArrayValues"
+        android:icon="@drawable/ic_save_black_24dp"
+        android:key="@string/save_answer_key"
+        android:title="@string/save_answer_dialog_title" />
+</PreferenceScreen>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="pref_on">On</string>
+    <string name="pref_off">Off</string>
+
+    <string-array name="saveAnswersArrayEntries">
+        <item>@string/pref_on</item>
+        <item>@string/pref_off</item>
+    </string-array>
+
+    <string-array name="saveAnswersArrayValues">
+        <item>@string/pref_on</item>
+        <item>@string/pref_off</item>
+    </string-array>
+
+    <string name="save_answer_key">saveAnswerKey</string>
+    <string name="save_answer_dialog_title">Confirmation Dialog to Save?</string>
+    <string name="save_answer_defaultValue">@string/pref_off</string>
+</resources>

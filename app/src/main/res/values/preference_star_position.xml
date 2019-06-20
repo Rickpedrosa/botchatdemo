@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="pref_before">Before</string>
+    <string name="pref_after">After</string>
+
+    <string-array name="starPosArrayEntries">
+        <item>@string/pref_before</item>
+        <item>@string/pref_after</item>
+    </string-array>
+
+    <string-array name="starPosArrayValues">
+        <item>@string/pref_before</item>
+        <item>@string/pref_after</item>
+    </string-array>
+
+    <string name="star_pos_key">starKey</string>
+    <string name="star_pos_dialog_title">Star Fav Positioning</string>
+    <string name="star_pos_defaultValue">@string/pref_before</string>
+</resources>
