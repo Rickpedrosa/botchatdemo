@@ -7,7 +7,7 @@ import java.util.List;
 
 //M for Model, VH for ViewHolder
 @SuppressWarnings("unused")
-public abstract class BaseRecyclerViewAdapter<M, VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH> {
+public abstract class BaseRecyclerViewAdapter<M, VH extends BaseViewHolder<M>> extends RecyclerView.Adapter<VH> {
 
     private List<M> data = new ArrayList<>();
 

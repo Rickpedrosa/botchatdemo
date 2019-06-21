@@ -2,24 +2,24 @@ package com.example.ricardopedrosarecupandroid.ui.fragment_main;
 
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.ricardopedrosarecupandroid.R;
 import com.example.ricardopedrosarecupandroid.base.BaseRecyclerViewAdapter;
+import com.example.ricardopedrosarecupandroid.base.BaseViewHolder;
 import com.example.ricardopedrosarecupandroid.data.local.entity.LiveChat;
-import com.example.ricardopedrosarecupandroid.databinding.MainChatItemBinding;
+import com.example.ricardopedrosarecupandroid.databinding.ChatItemBotBinding;
+import com.example.ricardopedrosarecupandroid.databinding.ChatItemUserBinding;
 import com.example.ricardopedrosarecupandroid.ui.main.MainActivityViewModel;
 
 public class MainFragmentViewAdapter extends BaseRecyclerViewAdapter<LiveChat,
-        MainFragmentViewAdapter.ViewHolder> {
+        BaseViewHolder<LiveChat>> {
 
     private MainActivityViewModel viewModel;
-    private static int BOT_TYPE = 0;
-    private static int USER_TYPE = 1;
+    private static final int BOT_TYPE = 0;
+    private static final int USER_TYPE = 1;
 
     MainFragmentViewAdapter(MainActivityViewModel viewModel) {
         this.viewModel = viewModel;
@@ -28,14 +28,22 @@ public class MainFragmentViewAdapter extends BaseRecyclerViewAdapter<LiveChat,
 
     @NonNull
     @Override
-    public MainFragmentViewAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new ViewHolder(DataBindingUtil.inflate(LayoutInflater.from(parent.getContext()),
-                R.layout.main_chat_item, parent, false));
+    public BaseViewHolder<LiveChat> onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        switch (viewType) {
+            case BOT_TYPE:
+                return new BotViewHolder(DataBindingUtil.inflate(LayoutInflater.from(parent.getContext()),
+                        R.layout.chat_item_bot, parent, false));
+            case USER_TYPE:
+                return new UserViewHolder(DataBindingUtil.inflate(LayoutInflater.from(parent.getContext()),
+                        R.layout.chat_item_user, parent, false));
+            default:
+                throw new IllegalArgumentException("Invalid view type");
+        }
     }
 
     @Override
-    public void onBindViewHolder(@NonNull MainFragmentViewAdapter.ViewHolder holder, int position) {
-        holder.bind(getItem(holder.getAdapterPosition()));
+    public void onBindViewHolder(@NonNull BaseViewHolder<LiveChat> holder, int position) {
+        holder.bind(getItem(position));
     }
 
     @Override
@@ -47,45 +55,35 @@ public class MainFragmentViewAdapter extends BaseRecyclerViewAdapter<LiveChat,
         }
     }
 
-    class ViewHolder extends RecyclerView.ViewHolder {
+    class BotViewHolder extends BaseViewHolder<LiveChat> {
 
-        private MainChatItemBinding b;
+        private ChatItemBotBinding b;
 
-        ViewHolder(@NonNull MainChatItemBinding itemView) {
+        BotViewHolder(ChatItemBotBinding itemView) {
             super(itemView.getRoot());
             b = itemView;
-//            b.cardLayoutChat.setOnClickListener(v -> {
-//                if (!getItem(getAdapterPosition()).isFav()) {
-//                    viewModel.updateMessageLiveChat(new LiveChat(
-//                            getItem(getAdapterPosition()).getId(),
-//                            getItem(getAdapterPosition()).getValue(),
-//                            getItem(getAdapterPosition()).getBotOrUser(),
-//                            true,
-//                            getItem(getAdapterPosition()).getDate_hour()
-//                    ));
-//                    Toast.makeText(
-//                            itemView.getRoot().getContext(),
-//                            "Message " + String.valueOf(getItem(getAdapterPosition()).getId()) + " updated",
-//                            Toast.LENGTH_SHORT).show();
-//                }
-//            });
         }
 
-        void bind(LiveChat item) {
-            b.lblChatContent.setText(item.getValue());
-            b.lblChatDate.setText(item.getDate_hour());
+        @Override
+        public void bind(LiveChat type) {
+            b.lblChatContent.setText(type.getValue());
+            b.lblChatDate.setText(type.getDate_hour());
+        }
+    }
 
-            if (item.isFav()) {
-                b.imgFavLeft.setImageResource(R.drawable.ic_star_black_24dp);
-            } else {
-                b.imgFavLeft.setImageResource(android.R.color.transparent);
-            }
+    class UserViewHolder extends BaseViewHolder<LiveChat> {
 
-            if (item.getBotOrUser() == 1) {
-                b.cardLayoutChat.setCardBackgroundColor(0xff2ecc71);
-            } else {
-                b.cardLayoutChat.setCardBackgroundColor(0xFFFFFFFF);
-            }
+        private ChatItemUserBinding b;
+
+        UserViewHolder(ChatItemUserBinding itemView) {
+            super(itemView.getRoot());
+            b = itemView;
+        }
+
+        @Override
+        public void bind(LiveChat type) {
+            b.lblChatContent.setText(type.getValue());
+            b.lblChatDate.setText(type.getDate_hour());
         }
     }
 }
