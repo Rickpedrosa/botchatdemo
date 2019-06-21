@@ -18,6 +18,8 @@ public class MainFragmentViewAdapter extends BaseRecyclerViewAdapter<LiveChat,
         MainFragmentViewAdapter.ViewHolder> {
 
     private MainActivityViewModel viewModel;
+    private static int BOT_TYPE = 0;
+    private static int USER_TYPE = 1;
 
     MainFragmentViewAdapter(MainActivityViewModel viewModel) {
         this.viewModel = viewModel;
@@ -34,6 +36,15 @@ public class MainFragmentViewAdapter extends BaseRecyclerViewAdapter<LiveChat,
     @Override
     public void onBindViewHolder(@NonNull MainFragmentViewAdapter.ViewHolder holder, int position) {
         holder.bind(getItem(holder.getAdapterPosition()));
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        if (getItem(position).getBotOrUser() == BOT_TYPE) {
+            return BOT_TYPE;
+        } else {
+            return USER_TYPE;
+        }
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {

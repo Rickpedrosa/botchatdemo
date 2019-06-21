@@ -99,6 +99,7 @@ public class MainFragment extends Fragment {
                 requireContext(),
                 RecyclerView.VERTICAL,
                 false);
+        linearLayoutManager.setStackFromEnd(true);
         listAdapter = new MainFragmentViewAdapter(viewModel);
         b.listChatMessages.setHasFixedSize(false);
         b.listChatMessages.setItemAnimator(new DefaultItemAnimator());
@@ -135,8 +136,10 @@ public class MainFragment extends Fragment {
         viewModel.getLiveChat().observe(this, liveChats -> listAdapter.submitList(liveChats));
 
         viewModel.theFuckingBot().observe(this, messageChat -> {
-            b.listChatMessages.postDelayed(this::sendMessage, 1000);
-            b.listChatMessages.postDelayed(() -> sendBotMessage(messageChat), 2000);
+            if (messageChat != null) {
+                b.listChatMessages.postDelayed(this::sendMessage, 1000);
+                b.listChatMessages.postDelayed(() -> sendBotMessage(messageChat), 2000);
+            }
         });
 
         viewModel.scrollPositionPointer().observe(this,
@@ -156,13 +159,15 @@ public class MainFragment extends Fragment {
     }
 
     private void sendMessage() {
+        viewModel.setUserMessage(b.txtChat.getText().toString());
         viewModel.addMessageToLiveChat(new LiveChat(
                 0,
-                b.txtChat.getText().toString(),
+                viewModel.getUserMessage(),
                 1,
                 false,
                 MyTimeUtils.getCurrentTime()
         ));
+        b.txtChat.setText("");
     }
 
     private void sendBotMessage(MessageChat messageChat) {

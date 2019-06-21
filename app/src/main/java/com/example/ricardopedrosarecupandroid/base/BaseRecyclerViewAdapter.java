@@ -29,5 +29,4 @@ public abstract class BaseRecyclerViewAdapter<M, VH extends RecyclerView.ViewHol
         data = dataList;
         notifyDataSetChanged();
     }
-
 }

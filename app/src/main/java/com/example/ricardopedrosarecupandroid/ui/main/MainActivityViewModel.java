@@ -26,6 +26,7 @@ public class MainActivityViewModel extends AndroidViewModel {
     private final Repository repo;
     private final Application application;
     private MutableLiveData<Boolean> fabTrigger = new MutableLiveData<>();
+    private String userMessage;
 
     public MainActivityViewModel(@NonNull Application application, AppDatabase database) {
         super(application);
@@ -58,12 +59,21 @@ public class MainActivityViewModel extends AndroidViewModel {
         fabTrigger.setValue(true);
     }
 
-    public void triggerDelete(){
+    public void triggerDelete() {
         fabTrigger.setValue(false);
     }
 
     public LiveData<MessageChat> theFuckingBot() {
-        return Transformations.switchMap(fabTrigger, input -> repo.getRandomBotMessageOmegaLUL());
+        return Transformations.switchMap(fabTrigger, new Function<Boolean, LiveData<MessageChat>>() {
+            @Override
+            public LiveData<MessageChat> apply(Boolean input) {
+                if (input) {
+                    return repo.getRandomBotMessageOmegaLUL();
+                } else {
+                    return null;
+                }
+            }
+        });
     }
 
     public LiveData<Integer> scrollPositionPointer() {
@@ -76,6 +86,14 @@ public class MainActivityViewModel extends AndroidViewModel {
                     }
                 }
         );
+    }
+
+    public String getUserMessage() {
+        return userMessage;
+    }
+
+    public void setUserMessage(String userMessage) {
+        this.userMessage = userMessage;
     }
 
     //*******************************************+
