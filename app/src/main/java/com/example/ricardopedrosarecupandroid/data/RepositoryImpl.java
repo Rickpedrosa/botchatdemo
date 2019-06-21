@@ -85,4 +85,9 @@ public class RepositoryImpl implements Repository {
     public LiveData<MessageChat> getRandomBotMessageOmegaLUL() {
         return messagesDao.getRandomBotMessageOmegaLUL();
     }
+
+    @Override
+    public void setMessageToBeFavorite(long id) {
+        AsyncTask.THREAD_POOL_EXECUTOR.execute(() -> liveChatDao.setMessageToBeFavorite(id));
+    }
 }

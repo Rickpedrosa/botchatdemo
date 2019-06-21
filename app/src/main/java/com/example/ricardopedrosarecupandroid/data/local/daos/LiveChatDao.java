@@ -27,6 +27,9 @@ public interface LiveChatDao {
     @Update(onConflict = OnConflictStrategy.REPLACE)
     void updateMessage(LiveChat chat);
 
+    @Query("UPDATE livechat SET isFav = 1 WHERE id = :id")
+    void setMessageToBeFavorite(long id);
+
     @Delete
     void deleteMessage(LiveChat chat);
 

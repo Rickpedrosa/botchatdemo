@@ -13,9 +13,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
+import androidx.navigation.ui.NavigationUI;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -68,6 +70,7 @@ public class MainFragment extends Fragment {
                     MyTimeUtils.getCurrentTime()
             ));
         }
+        observePreferences();
         setupRecyclerView();
         chatWithTheBot();
         observeLiveDataChat();
@@ -85,10 +88,10 @@ public class MainFragment extends Fragment {
                 viewModel.clearLiveChat();
                 return true;
             case R.id.settingsFragment:
-                navController.navigate(R.id.settingsFragment);
+                NavigationUI.onNavDestinationSelected(item, navController);
                 return true;
             case R.id.profileFragment:
-                navController.navigate(R.id.profileFragment);
+                NavigationUI.onNavDestinationSelected(item, navController);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -101,7 +104,11 @@ public class MainFragment extends Fragment {
                 RecyclerView.VERTICAL,
                 false);
         linearLayoutManager.setStackFromEnd(true);
-        listAdapter = new MainFragmentViewAdapter(viewModel);
+        listAdapter = new MainFragmentViewAdapter(viewModel, (liveChat, position) -> {
+            viewModel.triggerUpdate();
+            viewModel.updateFavoriteState(liveChat.getId());
+            listAdapter.notifyItemChanged(position);
+        });
         b.listChatMessages.setHasFixedSize(false);
         b.listChatMessages.setItemAnimator(new DefaultItemAnimator());
         b.listChatMessages.setLayoutManager(linearLayoutManager);
@@ -111,7 +118,6 @@ public class MainFragment extends Fragment {
                         ItemTouchHelper.UP | ItemTouchHelper.DOWN,
                         ItemTouchHelper.RIGHT) {
 
-                    // Cuando se detecta un gesto drag & drop.
                     @Override
                     public boolean onMove(@NonNull RecyclerView recyclerView,
                                           @NonNull RecyclerView.ViewHolder viewHolder,
@@ -126,22 +132,24 @@ public class MainFragment extends Fragment {
                     public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
                         viewModel.deleteMessageLiveChat(listAdapter.getItem(viewHolder.getAdapterPosition()));
                         viewModel.triggerDelete();
+                        listAdapter.notifyItemRemoved(viewHolder.getAdapterPosition());
+                        listAdapter.notifyItemRangeChanged(viewHolder.getAdapterPosition(), listAdapter.getItemCount());
                     }
                 });
         itemTouchHelper.attachToRecyclerView(b.listChatMessages);
     }
 
     private void observeLiveDataChat() {
-        viewModel.getLiveChat().observe(this, liveChats -> listAdapter.submitList(liveChats));
+        viewModel.getLiveChat().observe(requireActivity(), liveChats -> listAdapter.submitList(liveChats));
 
-        viewModel.theFuckingBot().observe(this, messageChat -> {
+        viewModel.theFuckingBot().observe(requireActivity(), messageChat -> {
             if (messageChat != null) {
                 b.listChatMessages.postDelayed(this::sendMessage, 1000);
                 b.listChatMessages.postDelayed(() -> sendBotMessage(messageChat), 2000);
             }
         });
 
-        viewModel.scrollPositionPointer().observe(this,
+        viewModel.scrollPositionPointer().observe(requireActivity(),
                 integer -> {
                     if (integer != null) {
                         b.listChatMessages.smoothScrollToPosition(integer);
@@ -149,9 +157,19 @@ public class MainFragment extends Fragment {
                 });
     }
 
+    private void observePreferences() {
+        viewModel.getFavIconPositionPreference().observe(requireActivity(), s -> viewModel.setPositionReferenceValue(s));
+        viewModel.getSaveMessagePreference().observe(requireActivity(), s -> viewModel.setSaveMessageValue(s));
+    }
+
     private void chatWithTheBot() {
         b.mainFragmentFab.setOnClickListener(v -> {
             if (!TextUtils.isEmpty(b.txtChat.getText().toString())) {
+//                if (viewModel.getSaveMessageValue().equals(getResources().getString(R.string.pref_off))) {
+//                    viewModel.triggerMessage();
+//                } else {
+//                    //DIALOG IMPL
+//                }
                 viewModel.triggerMessage();
             }
         });

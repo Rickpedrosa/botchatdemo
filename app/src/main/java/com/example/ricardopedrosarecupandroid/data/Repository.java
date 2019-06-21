@@ -36,4 +36,6 @@ public interface Repository {
     LiveData<Integer> getLiveChatSize();
     LiveData<MessageChat> getRandomBotMessageOmegaLUL();
 
+    void setMessageToBeFavorite(long id);
+
 }
