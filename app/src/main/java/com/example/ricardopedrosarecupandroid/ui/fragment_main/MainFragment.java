@@ -13,7 +13,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
@@ -46,7 +45,9 @@ public class MainFragment extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
         b = DataBindingUtil.inflate(inflater, R.layout.fragment_main, container, false);
         return b.getRoot();
     }
@@ -61,7 +62,7 @@ public class MainFragment extends Fragment {
         if (savedInstanceState == null) {
             viewModel.addMessageToLiveChat(new LiveChat(
                     0,
-                    "Hello there!",
+                    "si pos mira resulta que el otro dia estaba fumando un cigarrito con el jackono y el puto se empezo a cagar a muelte tumentiendeloketdigo",
                     0,
                     false,
                     MyTimeUtils.getCurrentTime()
@@ -121,10 +122,8 @@ public class MainFragment extends Fragment {
                         return true;
                     }
 
-                    // Cuando se detecta un gesto swipe to dismiss.
                     @Override
                     public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-                        // mAdapter.removeItem(viewHolder.getAdapterPosition());
                         viewModel.deleteMessageLiveChat(listAdapter.getItem(viewHolder.getAdapterPosition()));
                         viewModel.triggerDelete();
                     }

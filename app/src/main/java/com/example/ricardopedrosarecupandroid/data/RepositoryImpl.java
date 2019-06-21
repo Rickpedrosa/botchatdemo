@@ -31,11 +31,6 @@ public class RepositoryImpl implements Repository {
         return messagesDao.getGreetingMessage();
     }
 
-//    @Override
-//    public LiveData<List<MessageChat>> getRandomBotMessages() {
-//        return messagesDao.getRandomBotMessages();
-//    }
-
     @Override
     public void insertMessage(MessageChat messageChat) {
         AsyncTask.THREAD_POOL_EXECUTOR.execute(() -> messagesDao.insertMessage(messageChat));

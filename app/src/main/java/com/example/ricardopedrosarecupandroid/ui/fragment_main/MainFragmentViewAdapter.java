@@ -1,7 +1,9 @@
 package com.example.ricardopedrosarecupandroid.ui.fragment_main;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
@@ -55,6 +57,31 @@ public class MainFragmentViewAdapter extends BaseRecyclerViewAdapter<LiveChat,
         }
     }
 
+    private void addMessageToFavorites(int botOrUser, int position, Context context) {
+        LiveChat update = new LiveChat(
+                getItem(position).getId(),
+                getItem(position).getValue(),
+                botOrUser,
+                true,
+                getItem(position).getDate_hour()
+        );
+        if (botOrUser == 0 && !getItem(position).isFav()) {
+            viewModel.updateMessageLiveChat(update);
+            Toast.makeText(context,
+                    "Bot -> " +
+                            getItem(position).getId() +
+                            " added to favs",
+                    Toast.LENGTH_SHORT).show();
+        } else if (botOrUser == 1 && !getItem(position).isFav()) {
+            viewModel.updateMessageLiveChat(update);
+            Toast.makeText(context,
+                    "User -> " +
+                            getItem(position).getId() +
+                            " added to favs",
+                    Toast.LENGTH_SHORT).show();
+        }
+    }
+
     class BotViewHolder extends BaseViewHolder<LiveChat> {
 
         private ChatItemBotBinding b;
@@ -62,12 +89,24 @@ public class MainFragmentViewAdapter extends BaseRecyclerViewAdapter<LiveChat,
         BotViewHolder(ChatItemBotBinding itemView) {
             super(itemView.getRoot());
             b = itemView;
+            b.cardLayoutChatBot.setOnClickListener(v -> addMessageToFavorites(
+                    getItem(getAdapterPosition()).getBotOrUser(),
+                    getAdapterPosition(),
+                    b.cardLayoutChatBot.getContext()
+            ));
         }
 
         @Override
         public void bind(LiveChat type) {
             b.lblChatContent.setText(type.getValue());
             b.lblChatDate.setText(type.getDate_hour());
+            if (getItem(getAdapterPosition()).isFav()) {
+                b.imgFavLeft.setImageResource(R.drawable.ic_star_fav_24dp);
+                b.imgFavRight.setImageResource(android.R.color.transparent);
+            } else {
+                b.imgFavLeft.setImageResource(android.R.color.transparent);
+                b.imgFavRight.setImageResource(android.R.color.transparent);
+            }
         }
     }
 
@@ -78,12 +117,24 @@ public class MainFragmentViewAdapter extends BaseRecyclerViewAdapter<LiveChat,
         UserViewHolder(ChatItemUserBinding itemView) {
             super(itemView.getRoot());
             b = itemView;
+            b.cardLayoutChatUser.setOnClickListener(v -> addMessageToFavorites(
+                    getItem(getAdapterPosition()).getBotOrUser(),
+                    getAdapterPosition(),
+                    b.cardLayoutChatUser.getContext()
+            ));
         }
 
         @Override
         public void bind(LiveChat type) {
             b.lblChatContent.setText(type.getValue());
             b.lblChatDate.setText(type.getDate_hour());
+            if (getItem(getAdapterPosition()).isFav()) {
+                b.imgFavLeft.setImageResource(R.drawable.ic_star_fav_24dp);
+                b.imgFavRight.setImageResource(android.R.color.transparent);
+            }else {
+                b.imgFavLeft.setImageResource(android.R.color.transparent);
+                b.imgFavRight.setImageResource(android.R.color.transparent);
+            }
         }
     }
 }

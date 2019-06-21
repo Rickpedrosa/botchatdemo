@@ -9,16 +9,17 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp">
 
         <androidx.cardview.widget.CardView
             android:id="@+id/cardLayoutChatUser"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="8dp"
-            android:layout_marginTop="84dp"
             android:padding="8dp"
             app:cardBackgroundColor="#2ECC71"
+            app:cardCornerRadius="5dp"
+            app:cardElevation="2dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             card_view:cardCornerRadius="5dp"
@@ -38,9 +39,8 @@
                     android:layout_height="wrap_content"
                     android:textColor="#000000"
                     android:textStyle="bold"
-                    app:layout_constraintEnd_toStartOf="@id/lbl_chat_date"
-                    app:layout_constraintTop_toTopOf="parent"
-                    card_view:layout_constraintStart_toStartOf="parent" />
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
                     android:id="@+id/lbl_chat_date"
@@ -55,14 +55,16 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent" />
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/lbl_chat_date" />
 
                 <ImageView
                     android:id="@+id/img_fav_left"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@id/lbl_chat_date" />
+                    app:layout_constraintEnd_toStartOf="@id/lbl_chat_date"
+                    app:layout_constraintTop_toBottomOf="@id/lbl_chat_content" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
