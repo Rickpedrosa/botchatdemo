@@ -3,6 +3,7 @@ package com.example.ricardopedrosarecupandroid.ui.fragment_main;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
@@ -22,8 +23,10 @@ public class MainFragmentViewAdapter extends BaseRecyclerViewAdapter<LiveChat,
     private static final int BOT_TYPE = 0;
     private static final int USER_TYPE = 1;
     private OnChatItemTapped onChatItemTapped;
+    private String favPreference;
 
-    MainFragmentViewAdapter(MainActivityViewModel viewModel, OnChatItemTapped onChatItemTapped) {
+    MainFragmentViewAdapter(MainActivityViewModel viewModel,
+                            OnChatItemTapped onChatItemTapped) {
         this.viewModel = viewModel;
         this.onChatItemTapped = onChatItemTapped;
         //setHasStableIds(true); <--- problema con el scrol tapaba items y daba mala info al ir haciabajo
@@ -58,6 +61,27 @@ public class MainFragmentViewAdapter extends BaseRecyclerViewAdapter<LiveChat,
         }
     }
 
+    private void setImages(ImageView left, ImageView right, int position) {
+        if (favPreference.equals("Before")) {
+            if (getItem(position).isFav()) {
+                left.setImageResource(R.drawable.ic_star_fav_24dp);
+            } else {
+                right.setImageResource(android.R.color.transparent);
+            }
+        } else {
+            if (getItem(position).isFav()) {
+                right.setImageResource(R.drawable.ic_star_fav_24dp);
+            } else {
+                left.setImageResource(android.R.color.transparent);
+            }
+        }
+//        notifyItemChanged(position);
+    }
+
+    void setFavPreference(String favPreference) {
+        this.favPreference = favPreference;
+    }
+
     class BotViewHolder extends BaseViewHolder<LiveChat> {
 
         private ChatItemBotBinding b;
@@ -74,11 +98,7 @@ public class MainFragmentViewAdapter extends BaseRecyclerViewAdapter<LiveChat,
         public void bind(LiveChat type) {
             b.lblChatContent.setText(type.getValue().concat(" ").concat(String.valueOf(getAdapterPosition())));
             b.lblChatDate.setText(type.getDate_hour());
-            if (getItem(getAdapterPosition()).isFav()) {
-                b.imgFavLeft.setImageResource(R.drawable.ic_star_fav_24dp);
-            } else {
-                b.imgFavLeft.setImageResource(android.R.color.transparent);
-            }
+            setImages(b.imgFavLeft, b.imgFavRight, getAdapterPosition());
         }
     }
 
@@ -98,11 +118,7 @@ public class MainFragmentViewAdapter extends BaseRecyclerViewAdapter<LiveChat,
         public void bind(LiveChat type) {
             b.lblChatContent.setText(type.getValue().concat(" ").concat(String.valueOf(getAdapterPosition())));
             b.lblChatDate.setText(type.getDate_hour());
-            if (getItem(getAdapterPosition()).isFav()) {
-                b.imgFavLeft.setImageResource(R.drawable.ic_star_fav_24dp);
-            } else {
-                b.imgFavLeft.setImageResource(android.R.color.transparent);
-            }
+            setImages(b.imgFavLeft, b.imgFavRight, getAdapterPosition());
         }
     }
 }

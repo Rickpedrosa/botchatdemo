@@ -2,6 +2,7 @@ package com.example.ricardopedrosarecupandroid.ui.fragment_main;
 
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -58,7 +59,7 @@ public class MainFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         navController = NavHostFragment.findNavController(this);
-        viewModel = ViewModelProviders.of(this, new MainActivityViewModelFactory(
+        viewModel = ViewModelProviders.of(requireActivity(), new MainActivityViewModelFactory(
                 requireActivity().getApplication(), AppDatabase.getInstance(requireContext())
         )).get(MainActivityViewModel.class);
         if (savedInstanceState == null) {
@@ -70,10 +71,20 @@ public class MainFragment extends Fragment {
                     MyTimeUtils.getCurrentTime()
             ));
         }
-        observePreferences();
         setupRecyclerView();
         chatWithTheBot();
+        observePreferences();
         observeLiveDataChat();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        viewModel.getLiveChat().removeObservers(requireActivity());
+        viewModel.theFuckingBot().removeObservers(requireActivity());
+        viewModel.scrollPositionPointer().removeObservers(requireActivity());
+        viewModel.getFavIconPositionPreference().removeObservers(requireActivity());
+        viewModel.getSaveMessagePreference().removeObservers(requireActivity());
     }
 
     @Override
@@ -88,10 +99,12 @@ public class MainFragment extends Fragment {
                 viewModel.clearLiveChat();
                 return true;
             case R.id.settingsFragment:
-                NavigationUI.onNavDestinationSelected(item, navController);
+                //NavigationUI.onNavDestinationSelected(item, navController);
+                navController.navigate(R.id.settingsFragment);
                 return true;
             case R.id.profileFragment:
-                NavigationUI.onNavDestinationSelected(item, navController);
+                //NavigationUI.onNavDestinationSelected(item, navController);
+                navController.navigate(R.id.profileFragment);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -142,10 +155,13 @@ public class MainFragment extends Fragment {
     private void observeLiveDataChat() {
         viewModel.getLiveChat().observe(requireActivity(), liveChats -> listAdapter.submitList(liveChats));
 
-        viewModel.theFuckingBot().observe(requireActivity(), messageChat -> {
-            if (messageChat != null) {
-                b.listChatMessages.postDelayed(this::sendMessage, 1000);
-                b.listChatMessages.postDelayed(() -> sendBotMessage(messageChat), 2000);
+        viewModel.theFuckingBot().observe(requireActivity(), new Observer<MessageChat>() {
+            @Override
+            public void onChanged(MessageChat messageChat) {
+                if (messageChat != null) {
+                    b.listChatMessages.postDelayed(MainFragment.this::sendMessage, 1000);
+                    b.listChatMessages.postDelayed(() -> MainFragment.this.sendBotMessage(messageChat), 2000);
+                }
             }
         });
 
@@ -158,18 +174,13 @@ public class MainFragment extends Fragment {
     }
 
     private void observePreferences() {
-        viewModel.getFavIconPositionPreference().observe(requireActivity(), s -> viewModel.setPositionReferenceValue(s));
+        viewModel.getFavIconPositionPreference().observe(requireActivity(), s -> listAdapter.setFavPreference(s));
         viewModel.getSaveMessagePreference().observe(requireActivity(), s -> viewModel.setSaveMessageValue(s));
     }
 
     private void chatWithTheBot() {
         b.mainFragmentFab.setOnClickListener(v -> {
             if (!TextUtils.isEmpty(b.txtChat.getText().toString())) {
-//                if (viewModel.getSaveMessageValue().equals(getResources().getString(R.string.pref_off))) {
-//                    viewModel.triggerMessage();
-//                } else {
-//                    //DIALOG IMPL
-//                }
                 viewModel.triggerMessage();
             }
         });
@@ -184,7 +195,7 @@ public class MainFragment extends Fragment {
                 false,
                 MyTimeUtils.getCurrentTime()
         ));
-        b.txtChat.setText("");
+        //b.txtChat.setText("");
     }
 
     private void sendBotMessage(MessageChat messageChat) {
@@ -196,4 +207,5 @@ public class MainFragment extends Fragment {
                 MyTimeUtils.getCurrentTime()
         ));
     }
+
 }

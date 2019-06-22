@@ -145,5 +145,15 @@ public class MainActivityViewModel extends AndroidViewModel {
         repo.setMessageToBeFavorite(id);
     }
 
+    public LiveData<Boolean> getFabTrigger() {
+        return fabTrigger;
+    }
+
     //*******************************************+
+
+
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+    }
 }
