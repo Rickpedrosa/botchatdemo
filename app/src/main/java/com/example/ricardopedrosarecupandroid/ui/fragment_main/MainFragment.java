@@ -2,7 +2,6 @@ package com.example.ricardopedrosarecupandroid.ui.fragment_main;
 
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -18,7 +17,6 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
-import androidx.navigation.ui.NavigationUI;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -32,6 +30,8 @@ import com.example.ricardopedrosarecupandroid.databinding.FragmentMainBinding;
 import com.example.ricardopedrosarecupandroid.ui.main.MainActivityViewModel;
 import com.example.ricardopedrosarecupandroid.ui.main.MainActivityViewModelFactory;
 import com.example.ricardopedrosarecupandroid.utils.MyTimeUtils;
+
+import java.util.Random;
 
 public class MainFragment extends Fragment {
 
@@ -59,7 +59,7 @@ public class MainFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         navController = NavHostFragment.findNavController(this);
-        viewModel = ViewModelProviders.of(requireActivity(), new MainActivityViewModelFactory(
+        viewModel = ViewModelProviders.of(this, new MainActivityViewModelFactory(
                 requireActivity().getApplication(), AppDatabase.getInstance(requireContext())
         )).get(MainActivityViewModel.class);
         if (savedInstanceState == null) {
@@ -72,19 +72,8 @@ public class MainFragment extends Fragment {
             ));
         }
         setupRecyclerView();
-        chatWithTheBot();
         observePreferences();
         observeLiveDataChat();
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        viewModel.getLiveChat().removeObservers(requireActivity());
-        viewModel.theFuckingBot().removeObservers(requireActivity());
-        viewModel.scrollPositionPointer().removeObservers(requireActivity());
-        viewModel.getFavIconPositionPreference().removeObservers(requireActivity());
-        viewModel.getSaveMessagePreference().removeObservers(requireActivity());
     }
 
     @Override
@@ -118,7 +107,6 @@ public class MainFragment extends Fragment {
                 false);
         linearLayoutManager.setStackFromEnd(true);
         listAdapter = new MainFragmentViewAdapter(viewModel, (liveChat, position) -> {
-            viewModel.triggerUpdate();
             viewModel.updateFavoriteState(liveChat.getId());
             listAdapter.notifyItemChanged(position);
         });
@@ -144,7 +132,7 @@ public class MainFragment extends Fragment {
                     @Override
                     public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
                         viewModel.deleteMessageLiveChat(listAdapter.getItem(viewHolder.getAdapterPosition()));
-                        viewModel.triggerDelete();
+                        //viewModel.triggerDelete();
                         listAdapter.notifyItemRemoved(viewHolder.getAdapterPosition());
                         listAdapter.notifyItemRangeChanged(viewHolder.getAdapterPosition(), listAdapter.getItemCount());
                     }
@@ -153,49 +141,34 @@ public class MainFragment extends Fragment {
     }
 
     private void observeLiveDataChat() {
-        viewModel.getLiveChat().observe(requireActivity(), liveChats -> listAdapter.submitList(liveChats));
-
-        viewModel.theFuckingBot().observe(requireActivity(), new Observer<MessageChat>() {
-            @Override
-            public void onChanged(MessageChat messageChat) {
-                if (messageChat != null) {
-                    b.listChatMessages.postDelayed(MainFragment.this::sendMessage, 1000);
-                    b.listChatMessages.postDelayed(() -> MainFragment.this.sendBotMessage(messageChat), 2000);
-                }
-            }
+        viewModel.getLiveChat().observe(this, liveChats -> {
+            listAdapter.submitList(liveChats);
+            b.listChatMessages.smoothScrollToPosition(liveChats.size());
         });
+    }
 
-        viewModel.scrollPositionPointer().observe(requireActivity(),
-                integer -> {
-                    if (integer != null) {
-                        b.listChatMessages.smoothScrollToPosition(integer);
+    private void talkingWithBots(String savePreference) {
+        viewModel.getBotMessages().observe(this, messageChats ->
+                b.mainFragmentFab.setOnClickListener(v -> {
+                    if (!TextUtils.isEmpty(b.txtChat.getText().toString())) {
+                        if (savePreference.equals("Off")) {
+                            Random random = new Random();
+                            int pos = random.nextInt(messageChats.size() - 1) + 1;
+                            b.listChatMessages.postDelayed(MainFragment.this::sendUserMessage, 1000);
+                            b.listChatMessages.postDelayed(() -> MainFragment.this.sendBotMessage(
+                                    messageChats.get(pos)),
+                                    2000);
+                        }
+                    } else {
+                        //TODO dialogimpl
                     }
-                });
+
+                }));
     }
 
     private void observePreferences() {
-        viewModel.getFavIconPositionPreference().observe(requireActivity(), s -> listAdapter.setFavPreference(s));
-        viewModel.getSaveMessagePreference().observe(requireActivity(), s -> viewModel.setSaveMessageValue(s));
-    }
-
-    private void chatWithTheBot() {
-        b.mainFragmentFab.setOnClickListener(v -> {
-            if (!TextUtils.isEmpty(b.txtChat.getText().toString())) {
-                viewModel.triggerMessage();
-            }
-        });
-    }
-
-    private void sendMessage() {
-        viewModel.setUserMessage(b.txtChat.getText().toString());
-        viewModel.addMessageToLiveChat(new LiveChat(
-                0,
-                viewModel.getUserMessage(),
-                1,
-                false,
-                MyTimeUtils.getCurrentTime()
-        ));
-        //b.txtChat.setText("");
+        viewModel.getFavIconPositionPreference().observe(this, s -> listAdapter.setFavPreference(s));
+        viewModel.getSaveMessagePreference().observe(this, this::talkingWithBots);
     }
 
     private void sendBotMessage(MessageChat messageChat) {
@@ -208,4 +181,14 @@ public class MainFragment extends Fragment {
         ));
     }
 
+    private void sendUserMessage() {
+        viewModel.addMessageToLiveChat(new LiveChat(
+                0,
+                b.txtChat.getText().toString(),
+                1,
+                false,
+                MyTimeUtils.getCurrentTime()
+        ));
+        b.txtChat.setText("");
+    }
 }

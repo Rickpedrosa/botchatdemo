@@ -75,7 +75,6 @@ public class MainFragmentViewAdapter extends BaseRecyclerViewAdapter<LiveChat,
                 left.setImageResource(android.R.color.transparent);
             }
         }
-//        notifyItemChanged(position);
     }
 
     void setFavPreference(String favPreference) {
@@ -96,6 +95,8 @@ public class MainFragmentViewAdapter extends BaseRecyclerViewAdapter<LiveChat,
 
         @Override
         public void bind(LiveChat type) {
+            b.imgFavLeft.setImageResource(android.R.color.transparent);
+            b.imgFavRight.setImageResource(android.R.color.transparent);
             b.lblChatContent.setText(type.getValue().concat(" ").concat(String.valueOf(getAdapterPosition())));
             b.lblChatDate.setText(type.getDate_hour());
             setImages(b.imgFavLeft, b.imgFavRight, getAdapterPosition());
@@ -116,6 +117,8 @@ public class MainFragmentViewAdapter extends BaseRecyclerViewAdapter<LiveChat,
 
         @Override
         public void bind(LiveChat type) {
+            b.imgFavLeft.setImageResource(android.R.color.transparent);
+            b.imgFavRight.setImageResource(android.R.color.transparent);
             b.lblChatContent.setText(type.getValue().concat(" ").concat(String.valueOf(getAdapterPosition())));
             b.lblChatDate.setText(type.getDate_hour());
             setImages(b.imgFavLeft, b.imgFavRight, getAdapterPosition());
