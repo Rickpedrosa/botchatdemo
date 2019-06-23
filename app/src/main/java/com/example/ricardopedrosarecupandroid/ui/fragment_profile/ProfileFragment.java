@@ -18,7 +18,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
@@ -41,7 +40,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.List;
 import java.util.Objects;
 
 public class ProfileFragment extends Fragment {
@@ -77,6 +75,7 @@ public class ProfileFragment extends Fragment {
             if (TextUtils.isEmpty(b.txtName.getText().toString())) {
                 b.txtName.setText(requireContext().getString(R.string.bot_default_name));
                 setToolbarTitle(requireContext().getString(R.string.bot_default_name));
+                setBotImage();
             } else {
                 setToolbarTitle(b.txtName.getText().toString());
                 setBotImage();
@@ -112,7 +111,6 @@ public class ProfileFragment extends Fragment {
                 false
         ));
         b.listAnswers.setItemAnimator(new DefaultItemAnimator());
-        //b.listAnswers.setNestedScrollingEnabled(false);
         b.listAnswers.setAdapter(listAdapter);
     }
 
@@ -192,7 +190,11 @@ public class ProfileFragment extends Fragment {
     }
 
     private void observeData() {
-        viewModel.getBotValues().observe(this, strings -> listAdapter.submitList(strings));
+        viewModel.getBotValues().observe(this, strings -> {
+            listAdapter.submitList(strings);
+            b.lblBotAnswers.setText(getResources().getString(R.string.count_answers,
+                    String.valueOf(strings.size())));
+        });
     }
 
     private void addBotMessage() {

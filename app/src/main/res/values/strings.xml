@@ -8,4 +8,5 @@
     <string name="testing">POS LA VERDAD ES K HACE BUENA TARDE SJDHDJADADHAJDHAJDHAJDA</string>
     <string name="save_mnuprofile">Save</string>
     <string name="bot_default_name">BOT</string>
+    <string name="count_answers">%1$s answers</string>
 </resources>

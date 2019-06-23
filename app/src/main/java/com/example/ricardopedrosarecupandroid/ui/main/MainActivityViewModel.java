@@ -26,7 +26,7 @@ public class MainActivityViewModel extends AndroidViewModel {
     private final LiveData<String> favIconPositionPreference;
     private MutableLiveData<Boolean> recyclerPosition = new MutableLiveData<>();
 
-    public MainActivityViewModel(@NonNull Application application, AppDatabase database) {
+    MainActivityViewModel(@NonNull Application application, AppDatabase database) {
         super(application);
         this.repo = new RepositoryImpl(database.messagesDao(), database.liveChatDao());
         saveMessagePreference = new SharedPreferencesStringLiveData(

@@ -35,6 +35,7 @@
         <EditText
             android:id="@+id/txtName"
             android:layout_width="0dp"
+            android:textSize="12sp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
@@ -67,6 +68,7 @@
             android:layout_marginEnd="8dp"
             android:ems="10"
             android:hint="URL"
+            android:textSize="12sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/lbl_bot_url" />
@@ -76,7 +78,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:text="X answers"
+            android:text="@string/count_answers"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/txt_bot_url" />
 
@@ -88,11 +90,12 @@
             android:layout_marginEnd="8dp"
             android:ems="10"
             android:hint="Add answer..."
+            android:textSize="12sp"
             android:inputType="textPersonName"
+            app:layout_constraintBottom_toTopOf="@id/listAnswers"
             app:layout_constraintEnd_toStartOf="@+id/profile_fab_save_answer"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/lbl_bot_answers"
-            app:layout_constraintBottom_toTopOf="@id/listAnswers"/>
+            app:layout_constraintTop_toBottomOf="@+id/lbl_bot_answers" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/profile_fab_save_answer"
@@ -100,8 +103,8 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:clickable="true"
-            app:layout_constraintEnd_toEndOf="parent"
             android:src="@drawable/ic_send_white_24dp"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/lbl_bot_answers"
             tools:srcCompat="@tools:sample/avatars" />
 
