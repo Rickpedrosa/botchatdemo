@@ -1,19 +1,14 @@
 package com.example.ricardopedrosarecupandroid.ui.main;
 
 import android.app.Application;
-import android.app.ListActivity;
-import android.os.Message;
 
 import androidx.annotation.NonNull;
-import androidx.arch.core.util.Function;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Transformations;
 import androidx.preference.PreferenceManager;
 
 import com.example.ricardopedrosarecupandroid.R;
-import com.example.ricardopedrosarecupandroid.base.SharedPreferencesLiveData;
 import com.example.ricardopedrosarecupandroid.base.SharedPreferencesStringLiveData;
 import com.example.ricardopedrosarecupandroid.data.Repository;
 import com.example.ricardopedrosarecupandroid.data.RepositoryImpl;
@@ -21,7 +16,6 @@ import com.example.ricardopedrosarecupandroid.data.local.AppDatabase;
 import com.example.ricardopedrosarecupandroid.data.local.entity.LiveChat;
 import com.example.ricardopedrosarecupandroid.data.local.entity.MessageChat;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivityViewModel extends AndroidViewModel {
@@ -30,6 +24,7 @@ public class MainActivityViewModel extends AndroidViewModel {
     private final Repository repo;
     private final LiveData<String> saveMessagePreference;
     private final LiveData<String> favIconPositionPreference;
+    private MutableLiveData<Boolean> recyclerPosition = new MutableLiveData<>();
 
     public MainActivityViewModel(@NonNull Application application, AppDatabase database) {
         super(application);
@@ -67,7 +62,7 @@ public class MainActivityViewModel extends AndroidViewModel {
         return repo.getLiveChat();
     }
 
-    public LiveData<List<MessageChat>> getBotMessages(){
+    public LiveData<List<MessageChat>> getBotMessages() {
         return repo.getBotMessages();
     }
 
@@ -82,6 +77,22 @@ public class MainActivityViewModel extends AndroidViewModel {
     public void updateFavoriteState(long id) {
         repo.setMessageToBeFavorite(id);
     }
+
+    public MutableLiveData<Boolean> getRecyclerPosition() {
+        return recyclerPosition;
+    }
+
+    public void updateRecyclerPosition() {
+        recyclerPosition.setValue(true);
+    }
+
     //*******************************************+
 
+    public LiveData<List<String>> getBotValues() {
+        return repo.getAllBotValues();
+    }
+
+    public void addBotMessage(MessageChat messageChat){
+        repo.insertMessage(messageChat);
+    }
 }

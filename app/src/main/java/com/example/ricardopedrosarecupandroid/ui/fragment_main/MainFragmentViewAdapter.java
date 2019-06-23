@@ -1,7 +1,6 @@
 package com.example.ricardopedrosarecupandroid.ui.fragment_main;
 
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
@@ -14,20 +13,16 @@ import com.example.ricardopedrosarecupandroid.base.BaseViewHolder;
 import com.example.ricardopedrosarecupandroid.data.local.entity.LiveChat;
 import com.example.ricardopedrosarecupandroid.databinding.ChatItemBotBinding;
 import com.example.ricardopedrosarecupandroid.databinding.ChatItemUserBinding;
-import com.example.ricardopedrosarecupandroid.ui.main.MainActivityViewModel;
 
 public class MainFragmentViewAdapter extends BaseRecyclerViewAdapter<LiveChat,
         BaseViewHolder<LiveChat>> {
 
-    private MainActivityViewModel viewModel;
     private static final int BOT_TYPE = 0;
     private static final int USER_TYPE = 1;
     private OnChatItemTapped onChatItemTapped;
     private String favPreference;
 
-    MainFragmentViewAdapter(MainActivityViewModel viewModel,
-                            OnChatItemTapped onChatItemTapped) {
-        this.viewModel = viewModel;
+    MainFragmentViewAdapter(OnChatItemTapped onChatItemTapped) {
         this.onChatItemTapped = onChatItemTapped;
         //setHasStableIds(true); <--- problema con el scrol tapaba items y daba mala info al ir haciabajo
     }

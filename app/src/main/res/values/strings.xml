@@ -6,4 +6,6 @@
     <string name="hint_bot_name">hint bot name</string>
     <string name="bot_photo_url">Bot photo url</string>
     <string name="testing">POS LA VERDAD ES K HACE BUENA TARDE SJDHDJADADHAJDHAJDHAJDA</string>
+    <string name="save_mnuprofile">Save</string>
+    <string name="bot_default_name">BOT</string>
 </resources>

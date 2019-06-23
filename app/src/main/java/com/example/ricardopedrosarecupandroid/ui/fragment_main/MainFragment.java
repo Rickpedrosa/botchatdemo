@@ -1,5 +1,6 @@
 package com.example.ricardopedrosarecupandroid.ui.fragment_main;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -13,16 +14,17 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
+import androidx.navigation.ui.NavigationUI;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.ricardopedrosarecupandroid.R;
+import com.example.ricardopedrosarecupandroid.base.YesNoDialogFragment;
 import com.example.ricardopedrosarecupandroid.data.local.AppDatabase;
 import com.example.ricardopedrosarecupandroid.data.local.entity.LiveChat;
 import com.example.ricardopedrosarecupandroid.data.local.entity.MessageChat;
@@ -31,6 +33,7 @@ import com.example.ricardopedrosarecupandroid.ui.main.MainActivityViewModel;
 import com.example.ricardopedrosarecupandroid.ui.main.MainActivityViewModelFactory;
 import com.example.ricardopedrosarecupandroid.utils.MyTimeUtils;
 
+import java.util.List;
 import java.util.Random;
 
 public class MainFragment extends Fragment {
@@ -44,6 +47,18 @@ public class MainFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        viewModel = ViewModelProviders.of(this, new MainActivityViewModelFactory(
+                requireActivity().getApplication(), AppDatabase.getInstance(requireContext())
+        )).get(MainActivityViewModel.class);
+        if (savedInstanceState == null) {
+            viewModel.addMessageToLiveChat(new LiveChat(
+                    0,
+                    "si pos mira resulta que el otro dia estaba fumando un cigarrito con el jackono y el puto se empezo a cagar a muelte tumentiendeloketdigo",
+                    0,
+                    false,
+                    MyTimeUtils.getCurrentTime()
+            ));
+        }
     }
 
     @Nullable
@@ -59,18 +74,6 @@ public class MainFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         navController = NavHostFragment.findNavController(this);
-        viewModel = ViewModelProviders.of(this, new MainActivityViewModelFactory(
-                requireActivity().getApplication(), AppDatabase.getInstance(requireContext())
-        )).get(MainActivityViewModel.class);
-        if (savedInstanceState == null) {
-            viewModel.addMessageToLiveChat(new LiveChat(
-                    0,
-                    "si pos mira resulta que el otro dia estaba fumando un cigarrito con el jackono y el puto se empezo a cagar a muelte tumentiendeloketdigo",
-                    0,
-                    false,
-                    MyTimeUtils.getCurrentTime()
-            ));
-        }
         setupRecyclerView();
         observePreferences();
         observeLiveDataChat();
@@ -88,12 +91,10 @@ public class MainFragment extends Fragment {
                 viewModel.clearLiveChat();
                 return true;
             case R.id.settingsFragment:
-                //NavigationUI.onNavDestinationSelected(item, navController);
-                navController.navigate(R.id.settingsFragment);
+                NavigationUI.onNavDestinationSelected(item, navController);
                 return true;
             case R.id.profileFragment:
-                //NavigationUI.onNavDestinationSelected(item, navController);
-                navController.navigate(R.id.profileFragment);
+                NavigationUI.onNavDestinationSelected(item, navController);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -106,11 +107,11 @@ public class MainFragment extends Fragment {
                 RecyclerView.VERTICAL,
                 false);
         linearLayoutManager.setStackFromEnd(true);
-        listAdapter = new MainFragmentViewAdapter(viewModel, (liveChat, position) -> {
+        listAdapter = new MainFragmentViewAdapter((liveChat, position) -> {
             viewModel.updateFavoriteState(liveChat.getId());
             listAdapter.notifyItemChanged(position);
         });
-        b.listChatMessages.setHasFixedSize(false);
+        b.listChatMessages.setHasFixedSize(true);
         b.listChatMessages.setItemAnimator(new DefaultItemAnimator());
         b.listChatMessages.setLayoutManager(linearLayoutManager);
         b.listChatMessages.setAdapter(listAdapter);
@@ -132,9 +133,7 @@ public class MainFragment extends Fragment {
                     @Override
                     public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
                         viewModel.deleteMessageLiveChat(listAdapter.getItem(viewHolder.getAdapterPosition()));
-                        //viewModel.triggerDelete();
                         listAdapter.notifyItemRemoved(viewHolder.getAdapterPosition());
-                        listAdapter.notifyItemRangeChanged(viewHolder.getAdapterPosition(), listAdapter.getItemCount());
                     }
                 });
         itemTouchHelper.attachToRecyclerView(b.listChatMessages);
@@ -152,18 +151,38 @@ public class MainFragment extends Fragment {
                 b.mainFragmentFab.setOnClickListener(v -> {
                     if (!TextUtils.isEmpty(b.txtChat.getText().toString())) {
                         if (savePreference.equals("Off")) {
-                            Random random = new Random();
-                            int pos = random.nextInt(messageChats.size() - 1) + 1;
-                            b.listChatMessages.postDelayed(MainFragment.this::sendUserMessage, 1000);
-                            b.listChatMessages.postDelayed(() -> MainFragment.this.sendBotMessage(
-                                    messageChats.get(pos)),
-                                    2000);
+                            setupConversation(messageChats);
+                        } else {
+                            YesNoDialogFragment yndialog = YesNoDialogFragment.newInstance(
+                                    "Send message",
+                                    b.txtChat.getText().toString(),
+                                    "Send",
+                                    "Cancel");
+                            yndialog.setListener(new YesNoDialogFragment.Listener() {
+                                @Override
+                                public void onPositiveButtonClick(DialogInterface dialog) {
+                                    setupConversation(messageChats);
+                                }
+
+                                @Override
+                                public void onNegativeButtonClick(DialogInterface dialog) {
+                                    dialog.dismiss();
+                                }
+                            });
+                            yndialog.show(requireFragmentManager(), "Confirm Dialog");
                         }
-                    } else {
-                        //TODO dialogimpl
                     }
 
                 }));
+    }
+
+    private void setupConversation(List<MessageChat> messageChats) {
+        Random random = new Random();
+        int pos = random.nextInt(messageChats.size() - 1) + 1;
+        b.listChatMessages.postDelayed(MainFragment.this::sendUserMessage, 1000);
+        b.listChatMessages.postDelayed(() -> MainFragment.this.sendBotMessage(
+                messageChats.get(pos)),
+                2000);
     }
 
     private void observePreferences() {
@@ -189,6 +208,6 @@ public class MainFragment extends Fragment {
                 false,
                 MyTimeUtils.getCurrentTime()
         ));
-        b.txtChat.setText("");
+        b.txtChat.getText().clear();
     }
 }

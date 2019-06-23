@@ -90,4 +90,9 @@ public class RepositoryImpl implements Repository {
     public void setMessageToBeFavorite(long id) {
         AsyncTask.THREAD_POOL_EXECUTOR.execute(() -> liveChatDao.setMessageToBeFavorite(id));
     }
+
+    @Override
+    public LiveData<List<String>> getAllBotValues() {
+        return messagesDao.getAllBotValues();
+    }
 }

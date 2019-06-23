@@ -47,7 +47,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="@id/img_fav_right"
+                    app:layout_constraintEnd_toStartOf="@id/img_fav_right"
                     app:layout_constraintTop_toBottomOf="@id/lbl_chat_content" />
 
                 <ImageView
@@ -56,7 +56,7 @@
                     android:layout_height="wrap_content"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@id/lbl_chat_date" />
+                    />
 
                 <ImageView
                     android:id="@+id/img_fav_left"

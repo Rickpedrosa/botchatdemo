@@ -26,6 +26,9 @@ public interface MessagesDao {
     @Query("SELECT * FROM message ORDER BY RANDOM()")
     LiveData<MessageChat> getRandomBotMessageOmegaLUL();
 
+    @Query("SELECT value FROM message ORDER BY id")
+    LiveData<List<String>> getAllBotValues();
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertMessage(MessageChat messageChat);
 
