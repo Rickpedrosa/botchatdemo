@@ -3,9 +3,11 @@ package com.example.ricardopedrosarecupandroid.ui.main;
 import android.app.Application;
 
 import androidx.annotation.NonNull;
+import androidx.arch.core.util.Function;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Transformations;
 import androidx.preference.PreferenceManager;
 
 import com.example.ricardopedrosarecupandroid.R;
@@ -25,6 +27,17 @@ public class MainActivityViewModel extends AndroidViewModel {
     private final LiveData<String> saveMessagePreference;
     private final LiveData<String> favIconPositionPreference;
     private MutableLiveData<Boolean> recyclerPosition = new MutableLiveData<>();
+    public LiveData<Integer> liveChatCount = Transformations.switchMap(
+            recyclerPosition, new Function<Boolean, LiveData<Integer>>() {
+                @Override
+                public LiveData<Integer> apply(Boolean input) {
+                    if (input)
+                        return repo.getLiveChatSize();
+                    else
+                        return null;
+                }
+            }
+    );
 
     MainActivityViewModel(@NonNull Application application, AppDatabase database) {
         super(application);
@@ -78,12 +91,12 @@ public class MainActivityViewModel extends AndroidViewModel {
         repo.setMessageToBeFavorite(id);
     }
 
-    public MutableLiveData<Boolean> getRecyclerPosition() {
-        return recyclerPosition;
-    }
-
     public void updateRecyclerPosition() {
         recyclerPosition.setValue(true);
+    }
+
+    public void noTriggerLiveChatCount() {
+        recyclerPosition.setValue(false);
     }
 
     //*******************************************+
@@ -92,7 +105,7 @@ public class MainActivityViewModel extends AndroidViewModel {
         return repo.getAllBotValues();
     }
 
-    public void addBotMessage(MessageChat messageChat){
+    public void addBotMessage(MessageChat messageChat) {
         repo.insertMessage(messageChat);
     }
 }

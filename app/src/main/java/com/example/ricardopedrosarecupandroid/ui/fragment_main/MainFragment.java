@@ -14,6 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
@@ -109,6 +110,7 @@ public class MainFragment extends Fragment {
         linearLayoutManager.setStackFromEnd(true);
         listAdapter = new MainFragmentViewAdapter((liveChat, position) -> {
             viewModel.updateFavoriteState(liveChat.getId());
+            viewModel.noTriggerLiveChatCount();
             listAdapter.notifyItemChanged(position);
         });
         b.listChatMessages.setHasFixedSize(true);
@@ -133,6 +135,7 @@ public class MainFragment extends Fragment {
                     @Override
                     public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
                         viewModel.deleteMessageLiveChat(listAdapter.getItem(viewHolder.getAdapterPosition()));
+                        viewModel.noTriggerLiveChatCount();
                         listAdapter.notifyItemRemoved(viewHolder.getAdapterPosition());
                     }
                 });
@@ -140,18 +143,19 @@ public class MainFragment extends Fragment {
     }
 
     private void observeLiveDataChat() {
-        viewModel.getLiveChat().observe(this, liveChats -> {
-            listAdapter.submitList(liveChats);
-            b.listChatMessages.smoothScrollToPosition(liveChats.size());
-        });
+        viewModel.getLiveChat().observe(getViewLifecycleOwner(),
+                liveChats -> listAdapter.submitList(liveChats));
+        viewModel.liveChatCount.observe(getViewLifecycleOwner(),
+                integer -> b.listChatMessages.smoothScrollToPosition(integer));
     }
 
     private void talkingWithBots(String savePreference) {
-        viewModel.getBotMessages().observe(this, messageChats ->
+        viewModel.getBotMessages().observe(getViewLifecycleOwner(), messageChats ->
                 b.mainFragmentFab.setOnClickListener(v -> {
                     if (!TextUtils.isEmpty(b.txtChat.getText().toString())) {
                         if (savePreference.equals("Off")) {
                             setupConversation(messageChats);
+                            viewModel.updateRecyclerPosition();
                         } else {
                             YesNoDialogFragment yndialog = YesNoDialogFragment.newInstance(
                                     "Send message",
@@ -162,6 +166,7 @@ public class MainFragment extends Fragment {
                                 @Override
                                 public void onPositiveButtonClick(DialogInterface dialog) {
                                     setupConversation(messageChats);
+                                    viewModel.updateRecyclerPosition();
                                 }
 
                                 @Override
@@ -186,8 +191,8 @@ public class MainFragment extends Fragment {
     }
 
     private void observePreferences() {
-        viewModel.getFavIconPositionPreference().observe(this, s -> listAdapter.setFavPreference(s));
-        viewModel.getSaveMessagePreference().observe(this, this::talkingWithBots);
+        viewModel.getFavIconPositionPreference().observe(getViewLifecycleOwner(), s -> listAdapter.setFavPreference(s));
+        viewModel.getSaveMessagePreference().observe(getViewLifecycleOwner(), this::talkingWithBots);
     }
 
     private void sendBotMessage(MessageChat messageChat) {

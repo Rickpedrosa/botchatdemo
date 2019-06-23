@@ -190,7 +190,7 @@ public class ProfileFragment extends Fragment {
     }
 
     private void observeData() {
-        viewModel.getBotValues().observe(this, strings -> {
+        viewModel.getBotValues().observe(getViewLifecycleOwner(), strings -> {
             listAdapter.submitList(strings);
             b.lblBotAnswers.setText(getResources().getString(R.string.count_answers,
                     String.valueOf(strings.size())));
